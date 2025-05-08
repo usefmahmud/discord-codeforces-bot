@@ -52,6 +52,21 @@ class CodeforcesClient:
             'handle': handle,
             'count': count
         })
+    
+    def get_user_rating_colour(self, rank: str) -> Optional[int]:
+        cf_ratings = {
+            'newbie': 0x808080,
+            'pupil': 0x77dd77,
+            'specialist': 0x74b9ff,
+            'expert': 0xa29bff,
+            'candidate master': 0xfeca57,
+            'master': 0xff6b6b,
+            'international master': 0xffb86c,
+            'grandmaster': 0xfb355d,
+            'international grandmaster': 0xebb424
+        }
+        return cf_ratings.get(rank.lower(), 0x808080)
+                
 
 # Create a singleton instance
 cf_client = CodeforcesClient() 

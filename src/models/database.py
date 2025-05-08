@@ -42,6 +42,8 @@ class DatabaseManager:
                     handle TEXT NOT NULL,
                     verified INTEGER NOT NULL DEFAULT 0,
                     verification_code TEXT NOT NULL,
+                    rank TEXT NOT NULL,
+                    rating INTEGER NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
@@ -64,31 +66,50 @@ class DatabaseManager:
                         'handle': row[2],
                         'verified': bool(row[3]),
                         'verification_code': row[4],
-                        'created_at': row[5],
-                        'updated_at': row[6]
+                        'rank': row[5],
+                        'rating': row[6],
+                        'created_at': row[7],
+                        'updated_at': row[8]
                     }
                 return None
         except sqlite3.Error as e:
             logger.error(f'Error getting user data: {e}')
             return None
     
-    def add_user(self, user_id: int, name: str, handle: str, verification_code: str) -> bool:
+    def add_user(self, user_id: int, name: str, handle: str, verification_code: str, rank: str, rating: int) -> bool:
         try:
             with self.get_connection() as conn:
                 cursor = conn.cursor()
                 cursor.execute(
                     '''
                     INSERT INTO users 
-                    (user_id, name, handle, verified, verification_code)
-                    VALUES (?, ?, ?, ?, ?)
+                    (user_id, name, handle, verified, verification_code, rank, rating)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)
                     ''',
-                    (user_id, name, handle, False, verification_code)
+                    (user_id, name, handle, False, verification_code, rank, rating)
                 )
                 conn.commit()
                 return True
         except sqlite3.Error as e:
             logger.error(f'Error adding user: {e}')
             return False
+        
+    def update_user_rank_and_rating(self, user_id: int, rank: str, rating: int) -> bool:
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute(
+                    '''
+                    UPDATE users 
+                    SET rank = ?, rating = ?, updated_at = CURRENT_TIMESTAMP
+                    WHERE user_id = ?
+                    ''',
+                    (rank, rating, user_id)
+                )
+                conn.commit()
+        except sqlite3.Error as e:
+            logger.error(f'Error updating user rank and rating: {e}')
+        
     
     def update_user_verification(self, user_id: int, verified: bool) -> bool:
         try:

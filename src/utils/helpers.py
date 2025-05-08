@@ -13,7 +13,7 @@ def generate_verification_code(prefix: str = 'CF', length: int = 8) -> str:
     random_part = ''.join(random.choices(chars, k=length))
     return f'{prefix}-{random_part}'
 
-def create_status_embed(user: discord.User, user_data: dict) -> discord.Embed:
+def create_status_embed(user: discord.User, user_data: dict, is_info: bool = False) -> discord.Embed:
     embed = discord.Embed(
         title='Verification Status',
         color=discord.Color.green() if user_data['verified'] else discord.Color.orange(),
@@ -36,23 +36,30 @@ def create_status_embed(user: discord.User, user_data: dict) -> discord.Embed:
         value='✅ Verified' if user_data['verified'] else '⏳ Pending',
         inline=True
     )
+
+    embed.add_field(
+        name='Rating',
+        value=f'{user_data["rating"]} ({user_data["rank"]})',
+        inline=True
+    )
     
-    if not user_data['verified']:
-        embed.add_field(
-            name='Verification Code',
-            value=f'`{user_data["verification_code"]}`',
-            inline=False
-        )
-        embed.add_field(
-            name='Instructions',
-            value=(
-                '1. Go to your Codeforces profile settings\n'
-                '2. Change your organization to the verification code above\n'
-                '3. Run `/verify` command again'
-            ),
-            inline=False
-        )
-    
+    if not is_info:
+        if not user_data['verified']:
+            embed.add_field(
+                name='Verification Code',
+                value=f'`{user_data["verification_code"]}`',
+                inline=False
+            )
+            embed.add_field(
+                name='Instructions',
+                value=(
+                    '1. Go to your Codeforces profile settings\n'
+                    '2. Change your organization to the verification code above\n'
+                    '3. Run `/verify` command again'
+                ),
+                inline=False
+            )
+
     embed.set_footer(text='Last updated')
     return embed
 
