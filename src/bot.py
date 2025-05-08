@@ -7,6 +7,11 @@ class MyBot(commands.Bot):
     
     def __init__(self):
         intents = discord.Intents.default()
+
+        self.cogs_list = [
+            'src.cogs.verify',
+            'src.cogs.info' 
+        ]
         
         super().__init__(
             command_prefix=COMMAND_PREFIX,
@@ -18,9 +23,10 @@ class MyBot(commands.Bot):
         '''Set up the bot by loading extensions and syncing commands.'''
         try:
             # Load cogs
-            await self.load_extension('src.cogs.verify')
-            print('Successfully loaded verify cog')
-            
+            for cog in self.cogs_list:
+                await self.load_extension(cog)
+                print(f'Successfully loaded {cog} cog')
+            print('All cogs loaded')
             # Sync commands
             synced = await self.tree.sync()
             print(f'Synced {len(synced)} command(s)')
