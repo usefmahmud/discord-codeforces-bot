@@ -1,87 +1,63 @@
 # Discord Codeforces Verification Bot
 
-A Discord bot that verifies users by linking their Discord accounts with their Codeforces handles.
+A Discord bot to verify users with their Codeforces handle and display their rating and rank.
 
 ## Features
 
-- Verify users by linking Discord accounts with Codeforces handles
-- Check verification status
-- Rate-limited API calls to Codeforces
-- Proper error handling and logging
-- Scalable and maintainable codebase
-
-## Project Structure
-
-```
-src/
-├── bot/
-│   ├── api/            # API clients
-│   ├── cogs/           # Discord cogs
-│   ├── config/         # Configuration
-│   ├── models/         # Database models
-│   └── utils/          # Utility functions
-├── tests/              # Test files
-└── docs/              # Documentation
-```
+- **/verify**: Start the verification process with your Codeforces handle.
+- **/status**: Check your current verification status.
+- **/reset**: Reset your verification and remove your data.
+- **/info**: Get information about a user's Codeforces status.
 
 ## Setup
 
-1. Clone the repository:
+### Requirements
 
-```bash
-git clone <repository-url>
-cd <repository-name>
-```
+- Python 3.8+
+- The following Python packages (see `requirements.txt`):
 
-2. Create a virtual environment and activate it:
+### Environment Variables
 
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
-
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-4. Create a `.env` file in the root directory:
+Create a `.env` file in the root or `src/config/` directory with:
 
 ```
 BOT_TOKEN=your_discord_bot_token
 ```
 
-5. Run the bot:
+### Installation
 
-```bash
-python -m src.bot.bot
+1. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
+2. Set up your `.env` file as described above.
+
+### Running the Bot
+
+Start the bot with:
+
+```
+python run.py
 ```
 
-## Contributing
+## Usage
 
-1. Fork the repository
-2. Create a new branch for your feature
-3. Make your changes
-4. Write tests if applicable
-5. Submit a pull request
+### Verification Process
 
-### Code Style
+1. Use `/verify <your_codeforces_handle>` to start.
+2. The bot will give you a verification code.
+3. Go to your Codeforces profile settings and set your **organization** to the provided code.
+4. Run `/verify <your_codeforces_handle>` again to complete verification.
 
-- Follow PEP 8 guidelines
-- Use type hints
-- Write docstrings for all functions and classes
-- Keep functions small and focused
-- Use meaningful variable names
+### Other Commands
 
-### Adding New Features
+- `/status`: Shows your verification status and Codeforces info.
+- `/reset`: Removes your verification and data (confirmation required).
+- `/info <user>`: Shows Codeforces info for a user (if registered).
 
-1. Create a new cog in `src/bot/cogs/`
-2. Add any new API clients in `src/bot/api/`
-3. Add database models in `src/bot/models/`
-4. Add utility functions in `src/bot/utils/`
-5. Update configuration in `src/bot/config/`
+## Conditions & Notes
 
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
+- You must have a valid Codeforces handle.
+- The bot requires permission to manage roles in your Discord server.
+- The database is created automatically in `src/data/bot.db`.
+- The bot uses the Codeforces API and may be subject to rate limits.
