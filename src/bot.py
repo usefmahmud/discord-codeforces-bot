@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 
 from src.config.settings import BOT_TOKEN, COMMAND_PREFIX
-from src.models.database import db
+from src.models.user import UserManager
 
 class MyBot(commands.Bot):
     
@@ -55,7 +55,7 @@ class MyBot(commands.Bot):
         if member.bot:
             return
         
-        print(db.reset_user(member.id))
+        print(UserManager.reset_user(member.id))
 
 def main():
     try:

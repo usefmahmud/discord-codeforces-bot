@@ -1,17 +1,5 @@
-'''Helper functions for the Discord Codeforces Verification Bot.'''
-import string
-import random
-import logging
-from typing import Optional
 import discord
 from datetime import datetime
-
-logger = logging.getLogger(__name__)
-
-def generate_verification_code(prefix: str = 'CF', length: int = 8) -> str:
-    chars = string.ascii_uppercase + string.digits
-    random_part = ''.join(random.choices(chars, k=length))
-    return f'{prefix}-{random_part}'
 
 def create_status_embed(user: discord.User, user_data: dict, is_info: bool = False) -> discord.Embed:
     embed = discord.Embed(
@@ -63,14 +51,18 @@ def create_status_embed(user: discord.User, user_data: dict, is_info: bool = Fal
     embed.set_footer(text='Last updated')
     return embed
 
-def format_error_message(error: Exception) -> str:
-    error_type = type(error).__name__
-    error_msg = str(error)
-    logger.error(f'{error_type}: {error_msg}')
+def create_leaderboard_embed(leaderboard_list: list[dict], rating_icons: dict) -> discord.Embed:
+    description = f'**Top {len(leaderboard_list)} Players**\n'
+
+    for user in leaderboard_list:
+        description += f'''
+          {rating_icons[user['rank']]} **{user['handle']}**: {user['name']}
+          Rating: {user['rank']} - {user['rating']}
+          Points: {user['points']}\n'''
     
-    if isinstance(error, discord.errors.Forbidden):
-        return 'I don\'t have permission to perform this action'
-    elif isinstance(error, discord.errors.HTTPException):
-        return 'Discord API error occurred. Please try again later'
-    else:
-        return 'An unexpected error occurred. Please try again later' 
+    embed = discord.Embed(
+        title = '🏆 Leaderboard', 
+        description = description
+      )
+    
+    return embed

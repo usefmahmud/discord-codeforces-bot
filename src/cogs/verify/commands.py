@@ -4,9 +4,13 @@ import discord
 from discord.ext import commands
 from discord import app_commands, ui
 
-from src.models.database import db
+from src.models.user import UserManager
 from src.api.codeforces import cf_client
-from src.utils.helpers import generate_verification_code, create_status_embed, format_error_message
+from src.utils.discord_helpers import generate_verification_code, create_role, add_role_to_user
+from src.utils.embed_helpers import create_status_embed
+from src.utils.error_helpers import format_error_message
+
+from src.cogs.verify.views import ConfirmResetView
 
 class Verify(commands.Cog):    
     def __init__(self, bot: commands.Bot):
@@ -23,16 +27,21 @@ class Verify(commands.Cog):
                 await interaction.response.send_message('You are already verified')
                 return
             
-            cf_user = cf_client.get_user_info(handle)
+            cf_user = cf_client.get_user(handle)
             if not cf_user:
                 await interaction.response.send_message('Invalid handle or Codeforces API error')
                 return
             
             if user_data and not user_data['verified']:
                 if cf_user.get('organization') == user_data['verification_code']:
-                    if db.update_user_verification(interaction.user.id, True):
-                        await self._add_user_role(interaction, cf_user)
-                        await db.update_user_rank_and_rating(interaction.user.id, cf_user['rank'], cf_user['rating'])
+                    if UserManager.update_user(interaction.user.id, verified = True):
+                        await self._add_rank_role(interaction, cf_user)
+                        UserManager.update_user(
+                            interaction.user.id, 
+                            rank = cf_user['rank'], 
+                            rating = cf_user['rating']
+                        )
+
                         await interaction.response.send_message('You are now verified! ✅')
                     else:
                         await interaction.response.send_message('Error updating verification status. Please try again.')
@@ -41,14 +50,16 @@ class Verify(commands.Cog):
                 return
             
             # New user verification
+            if UserManager.is_handle_exists(handle):
+                await interaction.response.send_message('Handle already exists. Please use a different handle.')
+                return
+          
             verification_code = generate_verification_code()
-            if db.add_user(
-                interaction.user.id,
-                interaction.user.name,
-                handle,
-                verification_code,
-                rank = '',
-                rating = 0
+            if UserManager.add_user(
+                user_id = interaction.user.id,
+                name = interaction.user.name,
+                handle = handle,
+                verification_code = verification_code
             ):
                 await interaction.response.send_message(
                     f'To complete verification:\n'
@@ -61,35 +72,26 @@ class Verify(commands.Cog):
         except Exception as e:
             await interaction.response.send_message(format_error_message(e))
 
-    async def _add_user_role(self, interaction: discord.Interaction, user_data: dict) -> None:
-        guild = interaction.guild
-        role_name = user_data['rank']
-        role_color = cf_client.get_user_rating_colour(user_data['rank'])
-        role_permissions = discord.Permissions.none()
-        role_mentionable = True
-
-        role = await guild.create_role(
-            name = role_name, 
-            permissions = role_permissions, 
-            color = role_color, 
-            mentionable = role_mentionable
+    async def _add_rank_role(self, interaction: discord.Interaction, user_data: dict) -> None:
+        role = await create_role(
+            guild = interaction.guild,
+            role_name = user_data['rank'],
+            role_color = cf_client.rating_colors[user_data['rank']],
+            role_permissions = discord.Permissions.none(),
+            role_mentionable = True
         )
-
-        if not role.id:
-            return
         
-        await interaction.user.add_roles(role)
+        await add_role_to_user(
+            user = interaction.user,
+            role = role
+        )
 
     @app_commands.command(
         name='verify',
         description='Verify your account with your Codeforces handle'
     )
     async def verify(self, interaction: discord.Interaction, handle: str):
-        if db.is_handle_exists(handle):
-            await interaction.response.send_message('Handle already exists. Please use a different handle.')
-            return
-        
-        user_data = db.get_user(interaction.user.id)
+        user_data = UserManager.get(interaction.user.id)
         await self._handle_verification(interaction, handle, user_data)
 
     @app_commands.command(
@@ -98,7 +100,7 @@ class Verify(commands.Cog):
     )
     async def status(self, interaction: discord.Interaction):
         try:
-            user_data = db.get_user(interaction.user.id)
+            user_data = UserManager.get(interaction.user.id)
             if not user_data:
                 await interaction.response.send_message('You haven\'t started verification yet. Use `/verify` to begin.')
                 return
@@ -121,34 +123,6 @@ class Verify(commands.Cog):
         
         confirm_view.orig_interaction = interaction
 
-class ConfirmResetView(ui.View):
-    '''View for confirming or cancelling a reset.'''
-    def __init__(self, bot: commands.Bot, timeout: int):
-        super().__init__(timeout=timeout)
-        self.bot = bot
-        self.orig_interaction = None
-        
-    @ui.button(label='Confirm Reset', style=discord.ButtonStyle.danger)
-    async def confirm(self, interaction: discord.Interaction, button: ui.Button):
-        if interaction.user.id != self.orig_interaction.user.id:
-            await interaction.response.send_message('You cannot interact with this button.', ephemeral = True)
-            return
-            
-        if not db.reset_user(interaction.user.id):
-            await interaction.response.edit_message(content='Error resetting account. Please try again.', view = None)
-        else:
-            role = interaction.guild.get_role(interaction.user.roles[-1].id)
-            if role:
-                await interaction.user.remove_roles(role)
-            await interaction.response.edit_message(content='Account reset successfully.', view=None)
-        
-    @ui.button(label='Cancel', style=discord.ButtonStyle.secondary)
-    async def cancel(self, interaction: discord.Interaction, button: ui.Button):
-        if interaction.user.id != self.orig_interaction.user.id:
-            await interaction.response.send_message('You cannot interact with this button.', ephemeral = True)
-            return
-            
-        await interaction.response.edit_message(content='Reset cancelled.', view = None)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Verify(bot)) 

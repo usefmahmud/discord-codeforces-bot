@@ -13,6 +13,33 @@ class CodeforcesClient:
         self.base_url = CODEFORCES_API['base_url']
         self.rate_limit = CODEFORCES_API['rate_limit']
         self.last_request = 0
+
+        self.rating_colors = {
+            'unrated': 0x808080,
+            'newbie': 0x808080,
+            'pupil': 0x77dd77,
+            'specialist': 0x74b9ff,
+            'expert': 0xa29bff,
+            'candidate master': 0xfeca57,
+            'master': 0xff6b6b,
+            'international master': 0xffb86c,
+            'grandmaster': 0xfb355d,
+            'international grandmaster': 0xebb424
+        }   
+
+        self.rating_icons = {
+            'unrated': '⬜',
+            'newbie': '⬜',
+            'pupil': '🟢',
+            'specialist': '🔵',
+            'expert': '🔵',
+            'candidate master': '🟣',   
+            'master': '🟡',
+            'international master': '🟡',
+            'grandmaster': '🔴',
+            'international grandmaster': '🔴'
+        }
+        
     
     def _wait_for_rate_limit(self):
         current_time = time.time()
@@ -38,49 +65,17 @@ class CodeforcesClient:
             logger.error(f'Error making request to Codeforces API: {e}')
             return None
     
-    def get_user_info(self, handle: str) -> Optional[Dict[str, Any]]:
+    def get_user(self, handle: str) -> Optional[Dict[str, Any]]:
         result = self._make_request('user.info', {'handles': handle})
         if result and isinstance(result, list) and len(result) > 0:
             return result[0]
         return None
-    
-    def get_user_rating(self, handle: str) -> Optional[Dict[str, Any]]:
-        return self._make_request('user.rating', {'handle': handle})
     
     def get_user_submissions(self, handle: str, count: int = 10) -> Optional[Dict[str, Any]]:
         return self._make_request('user.status', {
             'handle': handle,
             'count': count
         })
-    
-    def get_user_rating_colour(self, rank: str) -> Optional[int]:
-        cf_ratings = {
-            'newbie': 0x808080,
-            'pupil': 0x77dd77,
-            'specialist': 0x74b9ff,
-            'expert': 0xa29bff,
-            'candidate master': 0xfeca57,
-            'master': 0xff6b6b,
-            'international master': 0xffb86c,
-            'grandmaster': 0xfb355d,
-            'international grandmaster': 0xebb424
-        }
-        return cf_ratings.get(rank.lower(), 0x808080)
-                
-
-    def get_user_rating_icon(self, rank: str) -> str:
-        cf_ranks = {
-            'newbie': '⬜',
-            'pupil': '🟢',
-            'specialist': '🔵',
-            'expert': '🔵',
-            'candidate master': '🟣',
-            'master': '🟡',
-            'international master': '🟡',
-            'grandmaster': '🔴',
-            'international grandmaster': '🔴'
-        }
-        return cf_ranks.get(rank.lower(), '⬜')
     
 # Create a singleton instance
 cf_client = CodeforcesClient() 
