@@ -9,11 +9,14 @@ class MyBot(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
         intents.members = True
+        intents.guilds = True
+
 
         self.cogs_list = [
             'src.cogs.verify',
             'src.cogs.info',
-            'src.cogs.leaderboard'
+            'src.cogs.leaderboard',
+            'src.cogs.cron'
         ]
         
         super().__init__(
