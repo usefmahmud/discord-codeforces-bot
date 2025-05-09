@@ -1,63 +1,91 @@
-# Discord Codeforces Verification Bot
+# Discord Codeforces Challenge Bot
 
-A Discord bot to verify users with their Codeforces handle and display their rating and rank.
+A Discord bot that integrates with Codeforces to create coding challenges between users, track progress, and foster competitive programming growth.
 
 ## Features
 
-- **/verify**: Start the verification process with your Codeforces handle.
-- **/status**: Check your current verification status.
-- **/reset**: Reset your verification and remove your data.
-- **/info**: Get information about a user's Codeforces status.
+### Current Implementation
 
-## Setup
+- **User Verification System**
 
-### Requirements
+  - Link Discord account to Codeforces handle
+  - Verification via Codeforces organization field
+  - Automatic role assignment based on Codeforces rank
+
+- **Information Commands**
+
+  - `/info` - View user profile information
+  - `/status` - Check verification status
+  - `/reset` - Reset account verification
+
+- **Leaderboard System**
+
+  - `/leaderboard` command with different scopes
+  - Ranking based on Codeforces ratings
+  - Visual indicators for different ranks
+
+- **Codeforces API Integration**
+  - User data retrieval
+  - Rating and rank tracking
+  - Rate-limited API requests
+
+## Project Roadmap
+
+### Sprint 1: Challenge System Implementation
+
+- Create `/challenge` command for random problems
+- Implement challenge acceptance system
+- Build solution verification via Codeforces submissions API
+- Track challenge statistics
+
+### Sprint 2: Solo Mode Implementation
+
+- Add `/solo` command for personal practice
+- Allow filtering by rating, difficulty, and tags
+- Implement progress tracking
+- Provide personalized problem recommendations
+
+### Sprint 3: Enhanced User Experience
+
+- Improve command responses with rich embeds
+- Create user statistics dashboard
+- Enhance error handling and feedback
+- Add visual progress indicators
+
+### Sprint 4: Community Features
+
+- Implement server-wide challenges
+- Add group competitions
+- Create event scheduling for contests
+- Build reward system
+
+## Future Enhancements
+
+- Contest notification system
+- Achievements and badges
+- Educational resources and learning paths
+
+## Technical Requirements
 
 - Python 3.8+
-- The following Python packages (see `requirements.txt`):
+- discord.py
+- SQLite database
+- Codeforces API access
 
-### Environment Variables
+## Installation
 
-Create a `.env` file in the root or `src/config/` directory with:
-
-```
-BOT_TOKEN=your_discord_bot_token
-```
-
-### Installation
-
-1. Install dependencies:
+1. Clone the repository
+2. Install dependencies: `pip install -r requirements.txt`
+3. Create a `.env` file with your Discord bot token:
    ```
-   pip install -r requirements.txt
+   BOT_TOKEN=your_discord_bot_token
    ```
-2. Set up your `.env` file as described above.
+4. Run the bot: `python -m src.bot`
 
-### Running the Bot
+## Contributing
 
-Start the bot with:
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-```
-python run.py
-```
+## License
 
-## Usage
-
-### Verification Process
-
-1. Use `/verify <your_codeforces_handle>` to start.
-2. The bot will give you a verification code.
-3. Go to your Codeforces profile settings and set your **organization** to the provided code.
-4. Run `/verify <your_codeforces_handle>` again to complete verification.
-
-### Other Commands
-
-- `/status`: Shows your verification status and Codeforces info.
-- `/reset`: Removes your verification and data (confirmation required).
-- `/info <user>`: Shows Codeforces info for a user (if registered).
-
-## Conditions & Notes
-
-- You must have a valid Codeforces handle.
-- The bot requires permission to manage roles in your Discord server.
-- The database is created automatically in `src/data/bot.db`.
-- The bot uses the Codeforces API and may be subject to rate limits.
+This project is licensed under the MIT License - see the LICENSE file for details.
