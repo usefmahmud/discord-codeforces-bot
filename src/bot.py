@@ -2,11 +2,13 @@ import discord
 from discord.ext import commands
 
 from src.config.settings import BOT_TOKEN, COMMAND_PREFIX
+from src.models.database import db
 
 class MyBot(commands.Bot):
     
     def __init__(self):
         intents = discord.Intents.default()
+        intents.members = True
 
         self.cogs_list = [
             'src.cogs.verify',
@@ -47,6 +49,13 @@ class MyBot(commands.Bot):
             await ctx.send('Command not found')
         else:
             await ctx.send('An error occurred while processing the command')
+
+    async def on_member_remove(self, member: discord.Member):
+        print(f'Member {member.name} ({member.id}) left the server')
+        if member.bot:
+            return
+        
+        print(db.reset_user(member.id))
 
 def main():
     try:
