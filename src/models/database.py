@@ -141,8 +141,10 @@ class DatabaseManager:
                     'handle': row[2],
                     'verified': bool(row[3]),
                     'verification_code': row[4],
-                    'created_at': row[5],
-                    'updated_at': row[6]
+                    'rank': row[5],
+                    'rating': row[6],
+                    'created_at': row[7],
+                    'updated_at': row[8]
                 } for row in rows]
         except sqlite3.Error as e:
             logger.error(f'Error getting all users: {e}')
