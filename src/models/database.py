@@ -180,6 +180,16 @@ class DatabaseManager:
         except sqlite3.Error as e:
             logger.error(f'Error getting leaderboard by rating: {e}')
             return []
+    
+    def is_handle_exists(self, handle: str) -> bool:
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT COUNT(*) FROM users WHERE handle = ?', (handle,))
+                return cursor.fetchone()[0] > 0
+        except sqlite3.Error as e:
+            logger.error(f'Error checking if handle exists: {e}')
+            return False
 
 
 # Create a singleton instance

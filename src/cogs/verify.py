@@ -85,6 +85,10 @@ class Verify(commands.Cog):
         description='Verify your account with your Codeforces handle'
     )
     async def verify(self, interaction: discord.Interaction, handle: str):
+        if db.is_handle_exists(handle):
+            await interaction.response.send_message('Handle already exists. Please use a different handle.')
+            return
+        
         user_data = db.get_user(interaction.user.id)
         await self._handle_verification(interaction, handle, user_data)
 
