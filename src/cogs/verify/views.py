@@ -3,7 +3,7 @@ from discord import ui
 from discord.ext import commands
 
 from src.models.user import UserManager
-
+from src.utils.discord_helpers import remove_rank_role_from_user
 class ConfirmResetView(ui.View):
     '''View for confirming or cancelling a reset.'''
     def __init__(self, bot: commands.Bot, timeout: int):
@@ -20,13 +20,10 @@ class ConfirmResetView(ui.View):
         if not UserManager.reset_user(interaction.user.id):
             await interaction.response.edit_message(content='Error resetting account. Please try again.', view = None)
         else:
-            rating_roles = ['unrated', 'newbie', 'pupil', 'specialist', 'expert', 
-                          'candidate master', 'master', 'international master',
-                          'grandmaster', 'international grandmaster']
-            
-            for role in interaction.user.roles:
-                if role.name.lower() in rating_roles:
-                    await interaction.user.remove_roles(role)
+            await remove_rank_role_from_user(
+                user_id = interaction.user.id,
+                guild = interaction.guild
+            )
             await interaction.response.edit_message(content='Account reset successfully.', view=None)
         
     @ui.button(label='Cancel', style=discord.ButtonStyle.secondary)

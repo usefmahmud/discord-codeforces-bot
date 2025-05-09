@@ -6,7 +6,7 @@ from discord import app_commands, ui
 
 from src.models.user import UserManager
 from src.api.codeforces import cf_client
-from src.utils.discord_helpers import generate_verification_code, create_role, add_role_to_user
+from src.utils.discord_helpers import generate_verification_code, add_rank_role_to_user
 from src.utils.embed_helpers import create_status_embed
 from src.utils.error_helpers import format_error_message
 
@@ -35,7 +35,11 @@ class Verify(commands.Cog):
             if user_data and not user_data['verified']:
                 if cf_user.get('organization') == user_data['verification_code']:
                     if UserManager.update_user(interaction.user.id, verified = True):
-                        await self._add_rank_role(interaction, cf_user)
+                        await add_rank_role_to_user(
+                            user_id = interaction.user.id,
+                            role_name = cf_user['rank'],
+                            guild = interaction.guild
+                        )
                         UserManager.update_user(
                             interaction.user.id, 
                             rank = cf_user['rank'], 
@@ -71,20 +75,6 @@ class Verify(commands.Cog):
                 await interaction.response.send_message('Error creating verification. Please try again.')
         except Exception as e:
             await interaction.response.send_message(format_error_message(e))
-
-    async def _add_rank_role(self, interaction: discord.Interaction, user_data: dict) -> None:
-        role = await create_role(
-            guild = interaction.guild,
-            role_name = user_data['rank'],
-            role_color = cf_client.rating_colors[user_data['rank']],
-            role_permissions = discord.Permissions.none(),
-            role_mentionable = True
-        )
-        
-        await add_role_to_user(
-            user = interaction.user,
-            role = role
-        )
 
     @app_commands.command(
         name='verify',
