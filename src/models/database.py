@@ -161,6 +161,24 @@ class DatabaseManager:
         except sqlite3.Error as e:
             logger.error(f'Error resetting user: {e}')
             return False
+        
+    def get_leaderboard_by_rating(self) -> List[Dict[str, Any]]:
+        try:
+            with self.get_connection() as conn:
+                cursor = conn.cursor()
+                cursor.execute('SELECT * FROM users ORDER BY rating DESC LIMIT 10')
+                rows = cursor.fetchall()
+                return [{
+                    'user_id': row[0],
+                    'name': row[1],
+                    'handle': row[2],
+                    'rank': row[5],
+                    'rating': row[6]
+                } for row in rows]
+        except sqlite3.Error as e:
+            logger.error(f'Error getting leaderboard by rating: {e}')
+            return []
+
 
 # Create a singleton instance
 db = DatabaseManager() 

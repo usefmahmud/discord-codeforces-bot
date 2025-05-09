@@ -10,7 +10,8 @@ class MyBot(commands.Bot):
 
         self.cogs_list = [
             'src.cogs.verify',
-            'src.cogs.info' 
+            'src.cogs.info',
+            'src.cogs.leaderboard'
         ]
         
         super().__init__(

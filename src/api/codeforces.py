@@ -68,5 +68,19 @@ class CodeforcesClient:
         return cf_ratings.get(rank.lower(), 0x808080)
                 
 
+    def get_user_rating_icon(self, rank: str) -> str:
+        cf_ranks = {
+            'newbie': '⬜',
+            'pupil': '🟢',
+            'specialist': '🔵',
+            'expert': '🔵',
+            'candidate master': '🟣',
+            'master': '🟡',
+            'international master': '🟡',
+            'grandmaster': '🔴',
+            'international grandmaster': '🔴'
+        }
+        return cf_ranks.get(rank.lower(), '⬜')
+    
 # Create a singleton instance
 cf_client = CodeforcesClient() 
