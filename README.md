@@ -1,4 +1,5 @@
 # Discord Codeforces Challenge Bot
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/usefmahmud/discord-codeforces-bot)
 
 A Discord bot that integrates with Codeforces to create coding challenges between users, track progress, and foster competitive programming growth.
 
