@@ -5,6 +5,7 @@ from src.models.problem import ProblemManager
 from src.data.constants import LITERAL_TAGS, LITERAL_RATING
 from typing import Optional
 from src.utils.embed_helpers import create_problem_embed
+from src.cogs.problem.views import ProblemFinishView
 
 class Problem(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -17,9 +18,11 @@ class Problem(commands.Cog):
         tag: Optional[LITERAL_TAGS] = None, 
         rating: Optional[LITERAL_RATING] = None
       ):
+        
         problem = ProblemManager.get_random_problem(tag, rating )
         embed = create_problem_embed(problem)
-        await interaction.response.send_message(embed=embed)
+        finish_view = ProblemFinishView(self.bot, problem)
+        finish_view.orig_interaction = interaction
+        await interaction.response.send_message(embed = embed, view = finish_view)
 
-async def setup(bot: commands.Bot):
-    await bot.add_cog(Problem(bot))
+
