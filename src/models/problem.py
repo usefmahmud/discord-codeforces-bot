@@ -54,3 +54,29 @@ class ProblemManager():
                 'rating': problem[4],
                 'tags': [tag[0] for tag in problem_tags],
             }
+
+    @staticmethod
+    def add_solved_problem(user_id: int, problem_id: int):
+        with ConnectionManager.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('INSERT INTO solved_problems (user_id, problem_id) VALUES (?, ?)', (user_id, problem_id))
+            conn.commit()
+
+    @staticmethod
+    def get_solved_problems(user_id: int) -> list[dict]:
+        with ConnectionManager.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('''SELECT p.problem_id, p.contest_id, p.problem_index, p.problem_name, p.problem_rating 
+                            FROM problems p 
+                            JOIN solved_problems sp ON p.problem_id = sp.problem_id 
+                            WHERE sp.user_id = ?''', (user_id,))
+            problems = cursor.fetchall()
+            
+            return [{
+                'problem_id': problem[0],
+                'contest_id': problem[1],
+                'index': problem[2],
+                'name': problem[3],
+                'rating': problem[4]
+            } for problem in problems]
+            

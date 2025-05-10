@@ -3,7 +3,7 @@ from discord import ui
 from discord.ext import commands
 
 from src.models.user import UserManager
-
+from src.models.problem import ProblemManager
 from src.api.codeforces import cf_client
 class ProblemFinishView(ui.View):
     def __init__(self, bot: commands.Bot, problem: dict):
@@ -25,6 +25,7 @@ class ProblemFinishView(ui.View):
         user = UserManager.get(interaction.user.id)
         if cf_client.check_problem_solved(user['handle'], self.problem['contest_id'], self.problem['index']):
             await interaction.response.send_message(f'You have succesfully solved the problem')
+            ProblemManager.add_solved_problem(interaction.user.id, self.problem['problem_id'])
             button.disabled = True
             return
 

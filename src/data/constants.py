@@ -96,3 +96,8 @@ LITERAL_RATING = Literal[
   "3100",
   "3200",
 ]
+
+
+LITERAL_STATISTICS_TYPE = Literal[
+  "solved problems",
+]
