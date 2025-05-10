@@ -4,6 +4,7 @@ from discord.ext import commands
 from src.models.problem import ProblemManager
 from src.data.constants import LITERAL_TAGS, LITERAL_RATING
 from typing import Optional
+from src.utils.embed_helpers import create_problem_embed
 
 class Problem(commands.Cog):
     def __init__(self, bot: commands.Bot):
@@ -16,13 +17,9 @@ class Problem(commands.Cog):
         tag: Optional[LITERAL_TAGS] = None, 
         rating: Optional[LITERAL_RATING] = None
       ):
-        print('tag', tag)
         problem = ProblemManager.get_random_problem(tag, rating )
-        if problem:
-            print('problem', problem)
-            await interaction.response.send_message(f"Problem: {problem['name']}\nRating: {problem['rating']}\nTags: {', '.join(problem['tags'])}")
-        else:
-            await interaction.response.send_message("No problems found")
+        embed = create_problem_embed(problem)
+        await interaction.response.send_message(embed=embed)
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Problem(bot))

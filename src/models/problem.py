@@ -31,8 +31,9 @@ class ProblemManager():
                     LIMIT 1
                 ''', (tag,))
                 problem = cursor.fetchone()
-                print(problem)
-                
+                if not problem:
+                    return None
+
                 problem_tags = cursor.execute('SELECT tag_name FROM problem_tags JOIN tags ON problem_tags.tag_id = tags.tag_id WHERE problem_id = ?', (problem[0],)).fetchall()
 
                 if problem and problem_tags:
@@ -51,14 +52,14 @@ class ProblemManager():
                 else:
                     problems_count = cursor.execute('SELECT problem_id FROM problems').fetchall()
                 random_problem_id = random.choice(problems_count)[0]
-                print(random_problem_id)
 
                 if rating:
                     problem = cursor.execute('SELECT * FROM problems WHERE problem_rating = ? AND problem_id = ?', (rating, random_problem_id)).fetchone()
                 else:
                     problem = cursor.execute('SELECT * FROM problems WHERE problem_id = ?', (random_problem_id,)).fetchone()
                 
-                print(problem)
+                if not problem:
+                    return None
 
                 problem_tags = cursor.execute('SELECT tag_name FROM problem_tags JOIN tags ON problem_tags.tag_id = tags.tag_id WHERE problem_id = ?', (problem[0],)).fetchall()
 
