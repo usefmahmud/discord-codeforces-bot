@@ -16,7 +16,8 @@ class MyBot(commands.Bot):
             'src.cogs.verify',
             'src.cogs.info',
             'src.cogs.leaderboard',
-            'src.cogs.cron'
+            'src.cogs.cron',
+            'src.cogs.problem',
         ]
         
         super().__init__(

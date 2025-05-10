@@ -77,5 +77,8 @@ class CodeforcesClient:
             'count': count
         })
     
+    def get_problems(self) -> Optional[Dict[str, Any]]:
+        return self._make_request('problemset.problems')['problems']
+    
 # Create a singleton instance
 cf_client = CodeforcesClient() 

@@ -22,6 +22,35 @@ def initialize_schema():
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS problems (
+                    problem_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    contest_id INTEGER NOT NULL,
+                    problem_index TEXT NOT NULL,
+                    problem_name TEXT NOT NULL,
+                    problem_rating INTEGER DEFAULT 0,
+                    problem_link TEXT NOT NULL
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS tags (
+                    tag_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    tag_name TEXT NOT NULL
+                )
+            ''')
+
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS problem_tags (
+                    problem_id INTEGER NOT NULL,
+                    tag_id INTEGER NOT NULL,
+                    PRIMARY KEY (problem_id, tag_id),
+                    FOREIGN KEY (problem_id) REFERENCES problems(problem_id),
+                    FOREIGN KEY (tag_id) REFERENCES tags(tag_id)
+                )
+            ''')
+
             conn.commit()
             logger.info("Database schema initialized successfully")
     except Exception as e:
