@@ -80,3 +80,9 @@ class ProblemManager():
                 'rating': problem[4]
             } for problem in problems]
             
+    @staticmethod
+    def get_total_problems_count() -> int:
+        with ConnectionManager.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute('SELECT COUNT(*) FROM problems')
+            return cursor.fetchone()[0]

@@ -1,6 +1,8 @@
 import discord
 from discord import ui
 import math
+from src.models.problem import ProblemManager
+
 class PaginatorView(ui.View):
     def __init__(self, problems, per_page = 5):
         super().__init__()
@@ -9,7 +11,7 @@ class PaginatorView(ui.View):
         self.total_pages = math.ceil(len(self.problems) / self.per_page)
         self.page = 0
         
-        self.embed = discord.Embed(title = 'Solved Problems')
+        self.embed = discord.Embed(title = f'Solved Problems ({len(self.problems)}) / {ProblemManager.get_total_problems_count()}')
         self.update_embed()
 
     def update_embed(self):

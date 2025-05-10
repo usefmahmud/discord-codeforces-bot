@@ -17,7 +17,6 @@ class Statistics(commands.Cog):
                 await interaction.response.send_message('You have not solved any problems yet')
                 return
             
-            print(problems)
             paginator = PaginatorView(problems)
             await interaction.response.send_message(embed = paginator.embed, view = paginator)
     
