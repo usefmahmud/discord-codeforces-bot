@@ -80,5 +80,14 @@ class CodeforcesClient:
     def get_problems(self) -> Optional[Dict[str, Any]]:
         return self._make_request('problemset.problems')['problems']
     
+    def check_problem_solved(self, handle: str, contest_id: str, problem_index: str) -> bool:
+        submissions = self.get_user_submissions(handle)
+        print(submissions   )
+        if submissions:
+            for submission in submissions:
+                if submission['problem']['contestId'] == contest_id and submission['problem']['index'] == problem_index and submission['verdict'] == 'OK':
+                    return True
+        return False
+    
 # Create a singleton instance
 cf_client = CodeforcesClient() 
